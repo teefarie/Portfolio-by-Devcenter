@@ -1,0 +1,510 @@
+<ng-container *ngIf="_appService.userPortfolio && _appService.user">
+  <div header [showUserNavigation]="true"></div>
+  <section class="bg-fade-light unverified">
+    <div class="wrapper">
+      <div class="builder-container">
+        <div class="builder-left">
+          <div class="form-card-holder" id="role-skill">
+            <div class="form-card animated fadeInUp">
+              <h3 class="h3">Role and Skill</h3>
+              <form #roleForm="ngForm" (ngSubmit)="saveRolesAndSkills(roleForm.form)" class="role-skill">
+                <div class="form-questions">
+                  <h4>I am primarily a... E.g Back-end Developer, Front-end Developer, Android Developer ... etc</h4>
+
+                  <ng-container *ngFor="let role of roles; let index = index">
+                    <h4 *ngIf="index == 1" style="margin-top: 20px;">I am also good at... E.g Mobile Development, Front-end Design, Database Management ... etc</h4>
+                    <div class="interactive-form">
+                      <input *ngIf="index == 0" class="first" type="text" name="role_and_skills_role_{{index}}"
+                             placeholder="" [attr.required]="index == 0"
+                             [ngModel]="role?.value" (ngModelChange)="updateRoles($event, index, 'value')"/>
+
+                      <input *ngIf="index != 0" class="first" type="text" name="role_and_skills_role_{{index}}"
+                             placeholder="{{ (index) | rolesPlaceholder | stringFormatPipe }} Secondary skill"
+                             [ngModel]="role?.value" (ngModelChange)="updateRoles($event, index, 'value')"/>
+
+                      <span>
+                        <a *ngIf="(role.delete_enabled && index < roles.length - 1) || (index + 1 >= maxRoles)"
+                           (click)="removeRole(index)">
+                            <img src="../../assets/img/delete.svg"/>
+                        </a>
+
+                        <a *ngIf="index == roles.length - 1 && index + 1 < maxRoles" (click)="addRole()">
+                            <img src="../../assets/img/add.svg"/>
+                        </a>
+                    </span>
+                    </div>
+                  </ng-container>
+
+                </div>
+
+                <div class="form-questions salary">
+                  <h4>Total number of years writing software?</h4>
+                  <div class="select-wrapper clear-select">
+                    <select required [ngModel]="(rolesAndSkills?.experience) ? rolesAndSkills?.experience : ''"
+                            name="roles_and_skills_experience">
+                      <option selected value="">Experience</option>
+                      <option value="1-3 years">1 - 3years</option>
+                      <option value="3-5 years">3 - 5years</option>
+                      <option value="5-7 years">5 - 7years</option>
+                      <option value="7years +">7years +</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-questions">
+                  <h4>What languages do you know and years of experience writing in
+                    it?<span>Type in your languages*</span>
+                  </h4>
+                  <div class="interactive-form" *ngFor="let language of languages; let index = index">
+                    <div>
+                      <input class="inline" type="text" name="role_and_skills_language_{{index}}"
+                             placeholder="Type language here"
+                             [attr.required]="index == 0"
+                             [ngModel]="language?.value"
+                             (ngModelChange)="updateLanguages($event, index, 'value')">
+
+                      <div class="select-wrapper clear-select">
+                        <select [attr.required]="index == 0"
+                                [ngModel]="(language?.experience) ? language?.experience : ''"
+                                name="role_and_skills_language_experience_{{index}}"
+                                (ngModelChange)="updateLanguages($event, index, 'experience')">
+                          <option value="">Experience</option>
+                          <option value="1-3 years">1 - 3years</option>
+                          <option value="3-5 years">3 - 5years</option>
+                          <option value="5-7 years">5 - 7years</option>
+                          <option value="7years +">7years +</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <span>
+                    <a *ngIf="(language.delete_enabled && index < languages.length - 1)"
+                       (click)="removeLanguage(index)">
+                        <img src="../../assets/img/delete.svg">
+                    </a>
+
+                    <a *ngIf="index == languages.length - 1" (click)="addLanguage()">
+                        <img src="../../assets/img/add.svg"/>
+                    </a>
+                </span>
+                  </div>
+                </div>
+
+                <div class="form-questions">
+                  <h4>Which frameworks and build tools are you most familiar
+                    with?<span>Arrange most familiar first*</span>
+                  </h4>
+                  <input type="text"
+                         [ngModel]="(rolesAndSkills && rolesAndSkills.frameworks && rolesAndSkills.frameworks.length) ? rolesAndSkills?.frameworks: ''"
+                         (ngModelChange)="explodeFrameworks($event)"
+                         name="roles_and_skills_frameworks_holder" #roles_and_skills_frameworks_holder
+                         placeholder="Ruby on Rails, Django">
+                  <h6>Separated by a comma</h6>
+                  <div class="tags">
+                    <ul *ngIf="frameworks.length">
+                      <ng-container *ngFor="let framework of frameworks; let index = index">
+                        <li *ngIf="framework.trim() != ''">
+                          <a href="">{{ framework | stringFormatPipe }}</a>
+                          <span><i class="fa fa-times-circle" aria-hidden="true"
+                                   (click)="deleteTag(index, frameworks, roles_and_skills_frameworks_holder)"></i></span>
+                        </li>
+                      </ng-container>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="form-questions">
+                  <h4>What build tools are you most familiar with?</h4>
+                  <input type="text" name="roles_and_skills_tools_holder" #roles_and_skills_tools_holder
+                         placeholder="Gulp, Groovy"
+                         [ngModel]="(rolesAndSkills && rolesAndSkills.tools && rolesAndSkills.tools.length) ? rolesAndSkills?.tools: ''"
+                         (ngModelChange)="explodeTools($event)">
+                  <h6>Separated by a comma</h6>
+                  <div class="tags">
+                    <ul *ngIf="tools.length">
+                      <ng-container *ngFor="let tool of tools; let index = index">
+                        <li *ngIf="tool.trim() != ''">
+                          <a href="">{{ tool | stringFormatPipe }}</a>
+                          <span><i class="fa fa-times-circle" aria-hidden="true"
+                                   (click)="deleteTag(index, tools, roles_and_skills_tools_holder)"></i></span>
+                        </li>
+                      </ng-container>
+                    </ul>
+                  </div>
+                </div>
+
+                <button class="button small" [disabled]="!roleForm.valid || submittingRolesAndSkills">
+                  <span
+                    *ngIf="_appService.user && (_appService.user.completed_level == 0 || !_appService.user.completed_level)">Next</span>
+                  <span *ngIf="_appService.user && _appService.user.completed_level >= 1">Save</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="form-card-holder" id="projects" *ngIf="_appService.user && _appService.user.completed_level > 0">
+            <div class="form-card animated fadeInUp">
+              <h3>Projects</h3>
+
+              <form #projectsForm="ngForm" (ngSubmit)="saveProjects()" class="projects">
+                <div class="form-questions">
+                  <div class="git-connect">
+                    <ul>
+                      <li>
+                        <div class="social-img">
+                          <img src="../../assets/img/github.svg">
+                        </div>
+
+                        <p>To make this easier, you can connect to your github account so we can pull your
+                          repositories (public) and display them here.</p>
+                        <github-btn></github-btn>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div *ngFor="let project of projects; let index = index">
+
+                  <div class="form-questions">
+                    <h4>Link to a project you worked on?</h4>
+                    <input type="text" placeholder="https://example.com" required
+                           [ngModel]="project?.link" name="project_link_{{index}}"
+                           (ngModelChange)="updateProject($event, index, 'link')">
+                  </div>
+
+                  <div class="form-questions">
+                    <h4>Languages, skills, frameworks used?</h4>
+                    <input type="text" placeholder="Rails, Django"
+                           [ngModel]="(project && project.technology && project.technology.length) ? project?.technology : ''"
+                           (ngModelChange)="explodeProjectFrameworks($event, index)"
+                           name="project_technology_{{index}}" #project_technology required="required">
+
+                    <h6>Separated by a comma</h6>
+                    <div class="tags">
+                      <ul *ngIf="project.technology != null && project.technology.length">
+                        <ng-container *ngFor="let technology of project.technology; let ind = index">
+                          <li *ngIf="technology.trim() != ''">
+                            <a href="">{{ technology | stringFormatPipe }}</a>
+                            <span><i class="fa fa-times-circle" aria-hidden="true"
+                                     (click)="deleteTag(ind, project.technology, project_technology)"></i></span>
+                          </li>
+                        </ng-container>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="form-questions">
+                    <h4>Project Description</h4>
+                    <h6>160 Characters max*</h6>
+                    <textarea maxlength="160" name="project_description_{{index}}"
+                              placeholder="Type in here"
+                              [ngModel]="project?.description"
+                              (ngModelChange)="updateProject($event, index, 'description')"></textarea>
+                    <input *ngIf="project.github" type="hidden" name="github" [ngModel]="project?.github" />
+                    <a *ngIf="project.delete_enabled" (click)="removeProject(index)">
+                      <img src="../../assets/img/delete.svg">
+                    </a>
+                  </div>
+                </div>
+
+                <div class="addmore-projects">
+
+                  <a (click)="addProject()">
+                    <img src="../../assets/img/add.svg">
+                  </a>
+
+                  <a (click)="addProject()">
+                    <h6>Add new project</h6>
+                  </a>
+                </div>
+
+
+                <button type="submit" [disabled]="!projectsForm.valid || submittingProjects" class="button small">
+                  <span *ngIf="_appService.user && _appService.user.completed_level < 2">Next</span>
+                  <span *ngIf="_appService.user && _appService.user.completed_level >= 2">Save</span>
+                </button>
+              </form>
+
+            </div>
+          </div>
+
+          <div class="form-card-holder" id="work-preference"
+               *ngIf="_appService.user && _appService.user.completed_level > 1">
+            <div class="form-card animated fadeInUp">
+              <h3>Work Preference</h3>
+              <form #workPreferenceForm="ngForm" (ngSubmit)="saveWorkPreference(workPreferenceForm)"
+                    class="work-preference">
+                <div class="form-questions">
+                  <h4>What type of employment are you looking for?* <span>You can select more than one*</span></h4>
+                  <label><input type="checkbox" name="work_preference_employment_type_full_time" value='1'
+                                [ngModel]="workPreference?.employment_type_full_time"/> Full Time</label>
+                  <label><input type="checkbox" name="work_preference_employment_type_contract" value='1'
+                                [ngModel]="workPreference?.employment_type_contract"/> Contract</label>
+                  <label><input type="checkbox" name="work_preference_employment_type_remote" value='1'
+                                [ngModel]="workPreference?.employment_type_remote"/> Remote</label>
+                  <label><input type="checkbox" name="work_preference_employment_type_internship" value='1'
+                                [ngModel]="workPreference?.employment_type_internship"/> Internship</label>
+                </div>
+
+                <div class="form-questions">
+                  <h4>What preferred roles are you looking for?* <span>Select 3 interested roles*</span></h4>
+                  <div class="interactive-form" *ngFor="let preferredRole of preferredRoles; let index = index">
+                    <input type="text" placeholder="Type top choice developer role"
+                           name="work_preference_preferred_roles_{{index}}"
+                           [ngModel]="preferredRole?.value"
+                           (ngModelChange)="updatePreferredRoles($event, index, 'value')"
+                           #work_preference_preferred_roles>
+                    <span>
+                      <a (click)="addPreferredRole()"
+                         *ngIf="index == preferredRoles.length - 1 && index + 1 < maxRoles">
+                        <img src="../../assets/img/add.svg">
+                      </a>
+                    </span>
+
+                    <span>
+                      <a
+                        *ngIf="(preferredRole.delete_enabled && index < preferredRoles.length - 1) || (index + 1 >= maxRoles)"
+                        (click)="removePreferredRole(index)">
+                        <img src="../../assets/img/delete.svg">
+                      </a>
+                    </span>
+                  </div>
+
+                  <div class="tags">
+                    <ul *ngIf="roles.length">
+                      <ng-container *ngFor="let preferredRole of preferredRoles; let index = index">
+                        <li *ngIf="preferredRole.value != null && preferredRole.value.trim() != ''">
+                          <a href="">{{ preferredRole?.value | stringFormatPipe }}</a>
+                          <span><i class="fa fa-times-circle" aria-hidden="true"
+                                   (click)="deleteTag(index, preferredRoles, work_preference_preferred_roles, 'preferredRoles')"></i></span>
+                        </li>
+                      </ng-container>
+
+                      <ng-container *ngFor="let role of roles">
+                        <li *ngIf="role.value != null && role.value.trim() != ''">
+                          <a pageScroll href="#role-skill">{{ role?.value }}</a>
+                        </li>
+                      </ng-container>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="form-questions salary">
+                  <h4>What are your base salary expectations?</h4>
+                  <select name="work_preference_expected_salary"
+                          [ngModel]="(workPreference?.expected_salary) ? workPreference?.expected_salary : ''">
+                    <option value="">Expected Salary</option>
+                    <option value="Below 100k">Below 100k</option>
+                    <option value="100 - 120k">100 - 120k</option>
+                    <option value="120 - 200K">120 - 200k</option>
+                    <option value="200 - 250k">200 - 250k</option>
+                    <option value="250 - 300k">250 - 300k</option>
+                    <option value="300 - 350K">300 - 350k</option>
+                    <option value="350 - 400k">350 - 400k</option>
+                    <option value="400k and above">400k and above</option>
+                  </select>
+                </div>
+
+                <div class="form-questions">
+                  <h4>Are you open to relocating, if required?</h4>
+                  <label><input type="radio" name="work_preference_open_to_relocate" value="1"
+                                [ngModel]="workPreference?.open_to_relocate + ''"/> Yes</label>
+                  <label><input type="radio" name="work_preference_open_to_relocate" value="0"
+                                [ngModel]="workPreference?.open_to_relocate + ''"/> No</label>
+                </div>
+
+                <button type="submit" class="button small"
+                        [disabled]="!workPreferenceForm.valid || submittingWorkPreference">
+                  <span *ngIf="_appService.user && _appService.user.completed_level < 3">Next</span>
+                  <span *ngIf="_appService.user && _appService.user.completed_level >= 3">Save</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="form-card-holder" id="recommendation"
+               *ngIf="_appService.user && _appService.user.completed_level > 2">
+            <div class="form-card animated fadeInUp">
+              <div>
+                <h3>Recommendations</h3>
+                <p class="recommendation-intro">
+                  Recommendations adds credibility to your portfolio and increases your
+                  chances of receiving offers. Add people you've worked with and we'll send them an email with a link
+                  to write a recommendation.</p>
+
+                <br>
+
+                <p class="recommendation-intro">
+                  Note: Your recommendations are strictly private to encourage an honest
+                  review and are not seen by anyone (even you) except companies who are looking for specific
+                  skills.</p>
+              </div>
+
+
+              <div class="recommendation-form">
+                <form #form="ngForm" (ngSubmit)="sendRecommendation(form.form)">
+                  <input type="text" [(ngModel)]="recommendation_full_name" name="recommendation_full_name"
+                         placeholder="Full Name" required minlength="3">
+                  <input type="email" [(ngModel)]="recommendation_email" name="recommendation_email"
+                         placeholder=" Email Address" required minlength="3">
+
+                  <select required [ngModel]="''"
+                          name="recommendation_position">
+                    <option value="">Position</option>
+                    <option value="CEO">CEO</option>
+                    <option value="CTO">CTO</option>
+                    <option value="Senior Engineer">Senior Engineer</option>
+                    <option value="Senior Developer">Senior Developer</option>
+                    <option value="Other">Other</option>
+                  </select>
+
+                  <button style="height: 37px;margin-top: 11px;" type="submit"
+                          [disabled]="!form.valid || submittingRecommendation" class="button small">Submit
+                  </button>
+                </form>
+              </div>
+
+              <div class="pending-recommendations"
+                   *ngIf="_appService.userUncompletedRecommendation != null && _appService.userUncompletedRecommendation.length">
+                <h4>Pending Recommendations</h4>
+                <div *ngFor="let recommendation of _appService.userUncompletedRecommendation">
+                  <pending-recommendation [recommendation]="recommendation"></pending-recommendation>
+                </div>
+              </div>
+
+              <div class="email-preview">
+                <h4>Email Preview:</h4>
+                <p>Hi {{ recommendation_full_name | parseRecommendationRecipientName }},</p>
+
+                <p>{{ _appService?.user?.first_name }} {{ _appService?.user?.last_name }} just created a Developer
+                  portfolio on our platform, a home for top technology talent in Africa and wants you to write a
+                  recommendation.</p>
+
+                <p>Your recommendation is private, and also withheld from {{ _appService?.user?.first_name }}
+                  to encourage an honest review. </p>
+
+                <p>You don't need to create an account or provide any personal information.</p>
+
+                <p> Your recommendation can help {{ _appService?.user?.first_name }} get hired and build a
+                  stronger professional reputation.</p>
+
+                <p>{{ _appService?.user?.first_name }} would really appreciate this!</p>
+              </div>
+
+              <div *ngIf="_appService.user && _appService.user.completed_level > 3">
+                <a [routerLink]="['/' + _appService.user.username]" class="button small">Save</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card-holder" id="social-account"
+               *ngIf="_appService.user && _appService.user.completed_level > 3">
+            <div class="form-card social-card animated fadeInUp" id="social">
+              <ul>
+                <li>
+                  <div class="social-img">
+                    <img src="../../assets/img/github.svg">
+                  </div>
+
+                  <p>Enables sign-in with Github, imports your Github profile photo, and links to your public
+                    repositories.</p>
+                  <github-btn></github-btn>
+                </li>
+
+                <li>
+                  <div class="social-img">
+                    <img src="../../assets/img/group.svg">
+                  </div>
+                  <p>Enables sign-in with Google and Google Calendar integration.</p>
+                  <google-btn></google-btn>
+                </li>
+
+                <li>
+                  <div class="social-img">
+                    <img src="../../assets/img/facebook.svg">
+                  </div>
+                  <p>Enables sign-in with Facebook and imports your Facebook profile photo.</p>
+                  <facebook-btn></facebook-btn>
+                </li>
+
+                <li>
+                  <div class="social-img">
+                    <img src="../../assets/img/twitter.svg">
+                  </div>
+                  <p>Enables sign-in with Twitter and links your public Twitter feed.</p>
+                  <twitter-btn></twitter-btn>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="view-profile" *ngIf="_appService.user && _appService.user.completed_level > 3">
+            <a [routerLink]="['/' + _appService.user.username]" class="button">View Portfolio</a>
+          </div>
+
+        </div>
+
+        <div class="builder-right">
+          <div class="form-card builder animated fadeInUp">
+            <h3>Portfolio Builder</h3>
+            <p class="intro">We know it's a bit long, but with all these you will be able to create a stellar profile
+              that
+              can get you interests and possibly a great job.</p>
+            <br>
+            <p class="intro">Here is a <a class="sample" href="http://portfolio.devcenter.co/sample-portfolio.html"
+                                          target="_blank">sample developer portfolio</a>, so you can have an idea of
+              what yours should look like.</p>
+
+            <ul class="timeline">
+              <li
+                [class.active]="_appService.user && _appService.user.completed_level == 0"
+                [class.done]="_appService.user && _appService.user.completed_level > 0">
+                <div class="timeline-step">
+                  <div></div>
+                </div>
+                <div><a pageScroll href="#role-skill">Role and Skill</a></div>
+              </li>
+
+              <li [class.active]="_appService.user && _appService.user.completed_level == 1"
+                  [class.done]="_appService.user && _appService.user.completed_level > 1">
+                <div class="timeline-step">
+                  <div></div>
+                </div>
+                <div><a pageScroll href="#projects">Projects</a></div>
+              </li>
+
+              <li [class.active]="_appService.user && _appService.user.completed_level == 2"
+                  [class.done]="_appService.user && _appService.user.completed_level > 2">
+                <div class="timeline-step">
+                  <div></div>
+                </div>
+                <div><a pageScroll href="#work-preference">Work Preferences</a></div>
+              </li>
+
+              <li [class.active]="_appService.user && _appService.user.completed_level == 3"
+                  [class.done]="_appService.user && _appService.user.completed_level > 3">
+                <div class="timeline-step">
+                  <div></div>
+                </div>
+                <div><a pageScroll href="#recommendation">Recommendations</a></div>
+              </li>
+
+              <li [class.active]="_appService.user && _appService.user.completed_level == 4"
+                  [class.done]="_appService.user && _appService.user.completed_level > 4">
+                <div class="timeline-step">
+                  <div></div>
+                </div>
+                <div><a pageScroll href="#social-account">Social Integrations</a></div>
+              </li>
+            </ul>
+            <!--<p class="intro red"> Sorry, you cannot go to the next card without completely filling this current card.-->
+            <!--This is to help you craft a complete portfolio that will stand out.</p>-->
+          </div>
+          <!--<div class="note animated fadeInUp">
+            <p>Fields that have an asterisk * are required fields.</p>
+          </div>-->
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>

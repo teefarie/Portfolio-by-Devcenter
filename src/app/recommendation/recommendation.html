@@ -1,0 +1,72 @@
+<div header [showUserNavigation]="false"></div>
+<section class="bg-light">
+  <div class="wrapper">
+    <div class="recommend-wrapper">
+      <div class="text-center animated fadeInUp">
+        <h3>{{ recommendee?.first_name }} {{ recommendee?.last_name }} has asked for you to recommend him.</h3>
+
+        <p>{{ _appService?.user?.first_name }} {{ _appService?.user?.last_name }} just created a Developer portfolio on our platform, a home for top technology talent in Africa and wants you to write a recommendation.</p>
+
+        <p>Your recommendation is private, and also withheld from {{ _appService?.user?.first_name }} to encourage an honest review. </p>
+
+        <p>You don't need to create an account or provide any personal information.</p>
+
+        <p> Your recommendation can help {{ _appService?.user?.first_name }} get hired and build a stronger professional reputation.</p>
+      </div>
+
+      <form #form="ngForm" (ngSubmit)="sendCompletedRecommendation(form.form)">
+        <div>
+          <textarea placeholder="Type in your recommendation here" name="recommendation_message"
+                    [ngModel]="recommendee?.recommendation" required></textarea>
+        </div>
+
+        <div class="recommend-skills">
+          <h4 class="blue">Can you also rate some of his/ her skills?</h4>
+          <ul class="tags-ratings-recommendations">
+            <div class="tags-inline">
+              <ng-container *ngFor="let language of languages; let index = index">
+                <li class="tags-ratings-list" *ngIf="language?.value">
+                  <div class="tag-container">
+                    <h5>{{ language.value | stringFormatPipe }} </h5>
+                  </div>
+
+                  <rating name="language_{{index}}" [count]="5" [init-value]="language?.rate" [ngModel]="language?.rate"
+                          (ngModelChange)="updateRecommendation($event, index, 'rate')"
+                          [required]="true"></rating>
+                </li>
+              </ng-container>
+            </div>
+          </ul>
+        </div>
+
+        <div class="recommend-small-info text-center">
+          <ul>
+            <li>
+              <span>Company</span>
+              <input type="text" name="company_name"
+                     [ngModel]="recommendee?.company_name"
+                     placeholder="Type your company name here" required>
+            </li>
+
+            <li>
+              <span>Position</span>
+              <select name="position" [ngModel]="(recommendee.position) ? recommendee?.position : ''" name="company_position" required>
+                <option value="">Select your position</option>
+                <option value="CEO">CEO</option>
+                <option value="CTO">CTO</option>
+                <option value="Senior Engineer">Senior Engineer</option>
+                <option value="Senior Developer">Senior Developer</option>
+              </select>
+            </li>
+          </ul>
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="button" [disabled]="!form.valid || submittingRecommendation">
+            Submit Recommendation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

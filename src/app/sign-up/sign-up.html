@@ -1,0 +1,61 @@
+<div header></div>
+
+<section class="bg-fade-light">
+  <div class="wrapper">
+    <div class="small-container">
+      <div class="signup-intro text-center">
+        <h3>Get started and create your portfolio</h3>
+        <!--<p class="blue">Companies apply to you, not the other way round. You can hide your info from your current and
+          former employees.</p>-->
+      </div>
+
+      <div class="signup-content animated fadeInUp">
+        <form #form="ngForm" (ngSubmit)="signUp(form.form)" class="signup-form">
+          <div class="form-field">
+            <h4>Full Name</h4>
+            <input type="text" name="fullname" [(ngModel)]="fullname" placeholder="Full Name" required minlength="3">
+          </div>
+
+          <div class="form-field">
+            <h4>Username</h4>
+            <input type="text" name="username" [(ngModel)]="username" placeholder="Username" required>
+          </div>
+
+          <div class="form-field">
+            <h4>Location</h4>
+              <location name="location" [ngModel]="''" required="True"></location>
+          </div>
+
+          <div class="form-field">
+            <h4>Email Address</h4>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="Email Address" required minlength="3">
+          </div>
+
+          <div class="form-field last">
+            <h4>Password</h4>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="Password" required minlength="3">
+          </div>
+
+          <div id="signup-terms">
+            <p>By signing up, you agree to Devcenter's terms of service and privacy policy. You may also receive
+              frequent emails and third party communications, which you may opt out of.</p>
+          </div>
+
+          <div class="signup-action">
+            <div>
+              <button class="button" [disabled]="!form.valid || submittingSignUp">
+                <span *ngIf="!submittingSignUp">Get Started</span>
+                <span *ngIf="submittingSignUp"><i class="fa fa-spinner fa-pulse fa-fw"
+                                                  aria-hidden="true"></i></span>
+              </button>
+            </div>
+            <div>
+              <h5>Already have an account? <br> <span><a [routerLink]="['/login']" class="blue">Log in</a></span></h5>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>

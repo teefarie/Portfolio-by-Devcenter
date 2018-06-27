@@ -1,0 +1,39 @@
+<div header></div>
+
+<section class="bg-fade-light">
+  <div class="wrapper">
+    <div class="small-container">
+      <div class="signup-intro text-center">
+        <h3>Login</h3>
+        <!-- <p class="blue">Profiles are an interesting way to keep track of jobs,
+          gigs and company intersts in you and your skills.</p> -->
+      </div>
+
+      <div class="signup-content animated fadeInUp">
+        <form #form="ngForm" (ngSubmit)="login(form.form)" class="signup-form">
+          <div class="form-field">
+            <h4>Email Address/Username</h4>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="Email Address / Username" required minlength="3">
+          </div>
+
+          <div class="form-field last">
+            <h4>Password</h4>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="Password" required minlength="3">
+          </div>
+
+          <div class="signup-action login">
+            <div>
+              <button type="submit" class="button login-button" [disabled]="!form.valid || submittingLogin">
+                Submit
+              </button>
+            </div>
+            <div>
+              <h5>Don't have an account? <br> <span><a [routerLink]="['/sign-up']" class="blue">Sign up</a></span></h5>
+            </div>
+          </div>
+          <a [routerLink]="['/forgot-password']" class="blue forgot-password">Forgot your password?</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,196 @@
+<ng-container *ngIf="_appService.userPortfolio && _appService.user">
+  <div header [showUserNavigation]="true"></div>
+  <section class="bg-fade-light" [class.unverified]="!_appService.user.activated || _appService.emailVerified">
+    <div class="wrapper">
+      <div class="settings-container">
+        <div class="settings-left">
+          <div id="account-settings-list" class="form-card animated fadeInUp">
+            <h3>Account Settings</h3>
+
+            <ul>
+              <li><a pageScroll href="#account-info">Account Information</a></li>
+              <li><a pageScroll href="#manage-password">Manage Password</a></li>
+              <li><a pageScroll href="#notifications">Notifications</a></li>
+              <li><a pageScroll href="#mute-portfolio">Mute Portfolio</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="settings-right">
+          <div id="account-info" class="form-card animated fadeInUp">
+            <form class="signup-form" #basicInfo="ngForm" (ngSubmit)="updateProfile(basicInfo.form)">
+              <div class="form-field">
+                <h4>Email Address</h4>
+                <input type="email" name="email" placeholder="Email Address" readonly
+                       value="{{ _appService?.user?.email }}">
+              </div>
+
+              <div class="form-field">
+                <h4>Username</h4>
+                <input type="text" name="username" placeholder="Username" readonly
+                       value="{{ _appService?.user?.username }}">
+              </div>
+
+              <div class="form-field">
+                <h4>Location</h4>
+                <location name="location" [ngModel]="_appService?.user?.location" required=True></location>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="button" [disabled]="!basicInfo.valid || submittingBasicInfo">
+                  <span *ngIf="!submittingBasicInfo">Save Changes</span>
+                  <span *ngIf="submittingBasicInfo"><i class="fa fa-spinner fa-pulse fa-fw"
+                                                       aria-hidden="true"></i></span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div  id="manage-password" class="form-card animated fadeInUp">
+            <form class="signup-form" #changePassword="ngForm" (ngSubmit)="changeUserPassword(changePassword.form)">
+              <div class="form-field">
+                <h4>Current Password</h4>
+                <input type="password" name="old_password" placeholder="Current Password" [(ngModel)]="old_password"
+                       required>
+              </div>
+
+              <div class="form-field">
+                <h4>New Password</h4>
+                <input type="password" name="new_password" placeholder="New Password" [(ngModel)]="new_password"
+                       required
+                       #newPassword>
+              </div>
+
+              <div class="form-field last">
+                <h4>Confirm New Password</h4>
+                <input type="password" name="confirm_new_password" placeholder="Confirm New Password"
+                       [(ngModel)]="confirm_new_password" required
+                       #confirmNewPassword>
+              </div>
+              <br>
+
+              <div class="text-center">
+                <button type="submit" class="button"
+                        [disabled]="!changePassword.valid || (newPassword.value != confirmNewPassword.value) || changingPassword">
+                  <span *ngIf="!changingPassword">Save Changes</span>
+                  <span *ngIf="changingPassword"><i class="fa fa-spinner fa-pulse fa-fw"
+                                                    aria-hidden="true"></i></span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div id="notifications" class="form-card account-preferences animated fadeInUp">
+            <form #notificationForm="ngForm" (ngSubmit)="updateNotification(notificationForm.form)">
+              <p class="blue text-center">I'm not looking for a job at the moment, but you can
+                send me job and gigs updates. </p>
+              <div>
+                <ul>
+                  <li>
+                    <span>Email</span>
+                    <label><input type="checkbox" name="notification_reminder"
+                                  [ngModel]="_appService?.user?.notification_reminder" value="1"/> Reminders (Interests,
+                      Offers,
+                      Interviews, Calendar Updates)</label>
+                  </li>
+
+                  <li>
+                    <span>Email</span>
+                    <label><input type="checkbox" name="notification_newsletter"
+                                  [ngModel]="_appService?.user?.notification_newsletter" value="1"/> Receive
+                      Devcenter
+                      Newletters</label>
+                  </li>
+
+                  <li>
+                    <span>Email</span>
+                    <label><input type="checkbox" name="notification_job_matches"
+                                  [ngModel]="_appService?.user?.notification_job_matches" value="1"/> Receive emails
+                      of Job Matches</label>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="show-public">
+                <span>Show your portfolio publicly</span>
+                <label><input type="radio" name="profile_public" value="1"
+                              [ngModel]="''+_appService?.user?.profile_public"/> Yes</label>
+                <label><input type="radio" name="profile_public" value="0"
+                              [ngModel]="''+_appService?.user?.profile_public"/> No</label>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="button" [disabled]="submittingNotification">
+                  <em *ngIf="!submittingNotification">Save Changes</em>
+                  <em *ngIf="submittingNotification"><i class="fa fa-spinner fa-pulse fa-fw"
+                                                        aria-hidden="true"></i></em>
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+          <div id="mute-portfolio" class="form-card account-mute animated fadeInUp">
+            <form #muteForm="ngForm" (ngSubmit)="updateMute(muteForm.form)">
+              <p class="blue text-center">You can mute portfolio for sometime, if all you need is less noise.</p>
+
+              <h5 class="blue text-center">Reasons for muting portfolio</h5>
+              <div>
+                <ul>
+                  <li>
+                    <label><input type="radio" value="I've gotten a job, No real reason to keep portfolio"
+                                  name="mute_reason"
+                                  [ngModel]="_appService?.user?.mute_reason" required/> I've gotten a job, No real
+                      reason
+                      to
+                      keep portfolio</label>
+                  </li>
+
+                  <li>
+                    <label><input type="radio" value="I use some other service to hunt for jobs"
+                                  name="mute_reason"
+                                  [ngModel]="_appService?.user?.mute_reason" required/> I use some other service to hunt
+                      for jobs</label>
+                  </li>
+
+                  <li>
+                    <label><input type="radio"
+                                  value="No valuable gigs or jobs offers"
+                                  name="mute_reason"
+                                  [ngModel]="_appService?.user?.mute_reason" required/> No valuable gigs or jobs
+                      offers</label>
+                  </li>
+
+                  <li>
+                    <label><input type="radio"
+                                  value="Others"
+                                  name="mute_reason"
+                                  #mute_others
+                                  [ngModel]="_appService?.user?.mute_reason"
+                                  (ngModelChange)="updateMute($event)" required/> Others. (Please Specify the
+                      reason)</label>
+                  </li>
+
+                  <div class="form-questions" *ngIf="mute_others.checked">
+                    <h6>160 Characters max*</h6>
+                    <textarea required
+                              name="mute_others_reason"
+                              [ngModel]="_appService?.user?.mute_others_reason">
+                    Type your reason for deactivating your portfolio</textarea>
+                  </div>
+                </ul>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="button" [disabled]="!muteForm.valid || submittingMute">
+                  <span *ngIf="!submittingMute">Save Changes</span>
+                  <span *ngIf="submittingMute"><i class="fa fa-spinner fa-pulse fa-fw" aria-hidden="true"></i></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>

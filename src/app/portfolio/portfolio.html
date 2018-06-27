@@ -1,0 +1,182 @@
+<ng-container *ngIf="userPortfolio && user">
+  <div header [showUserNavigation]="true"></div>
+
+  <div class="colored-header"></div>
+
+  <section class="bg-fade-light">
+    <div class="wrapper">
+      <input type="file" name="profile-image" id="profile-image" style="visibility:hidden"
+             (change)="onChange($event)" #profile_image/>
+      <div class="portfolio-container">
+        <div class="portfolio-content">
+          <div class="form-card text-center animated fadeInUp" id="portfolio-summary">
+
+            <div class="profile-image" *ngIf="!(imageSrc && user.profile_image)"
+                 (mouseenter)="onMouseOver($event)"
+                 (mouseleave)="onMouseOut($event)"
+                 [style.background-color]="environment.color_codes[user.first_name[0].toLowerCase()]">
+              {{ user.first_name|initials: user.last_name }}
+            </div>
+
+            <div class="profile-image" *ngIf="user.profile_image"
+                 (mouseenter)="onMouseOver($event)"
+                 (mouseleave)="onMouseOut($event)"
+                 [style.background-image]="_sanitizer.bypassSecurityTrustStyle('url(' + user.profile_image + ')')"
+                 [style.background-color]="environment.color_codes[user.first_name[0].toLowerCase()]">
+            </div>
+
+            <div class="profile-image" *ngIf="imageSrc"
+                 (mouseenter)="onMouseOver($event)"
+                 (mouseleave)="onMouseOut($event)"
+                 [style.background-image]="_sanitizer.bypassSecurityTrustStyle('url(' + imageSrc + ')')">
+            </div>
+
+            <label for="profile-image"
+                   (mouseenter)="onMouseOver($event)"
+                   (mouseleave)="onMouseOut($event)">
+
+              <div class="profile-image-overlay"
+                   *ngIf="_appService.user && (_appService.user.username == user.username) && avatarChange">
+                <i class="fa fa-camera" aria-hidden="true" *ngIf="!uploadingProfileImage"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw" aria-hidden="true" *ngIf="uploadingProfileImage"></i>
+              </div>
+            </label>
+
+            <h3 class="name">{{ user?.first_name }} {{ user?.last_name }}</h3>
+            <h5 class="location">Based in <span class="blue">Lagos</span> (<span
+              *ngIf="userPortfolio.work_preference && !userPortfolio.work_preference.open_to_relocate">Not 
+              </span>available to relocate)
+            </h5>
+            <p class="bio">I'm primarily a <span class="blue">{{ userPortfolio?.roles_and_skills?.roles[0].value | stringFormatPipe }}</span>
+              <ng-container *ngIf="userPortfolio?.roles_and_skills?.roles[1]">
+                who is also good at <span class="blue">{{ userPortfolio?.roles_and_skills?.roles[1].value | stringFormatPipe }}</span>
+                <ng-container *ngIf="userPortfolio?.roles_and_skills?.roles[2]">
+                  and <span class="blue">{{ userPortfolio?.roles_and_skills?.roles[2].value | stringFormatPipe }}</span>
+                </ng-container>
+                .
+                I have <span class="blue">{{ user.experience }} experience</span> in writing software.
+              </ng-container>
+            </p>
+
+            <div class="tags" *ngIf="userPortfolio?.roles_and_skills?.languages.length">
+              <ul>
+                <li *ngFor="let language of userPortfolio?.roles_and_skills?.languages">
+                  {{ language.value | stringFormatPipe }}
+                </li>
+              </ul>
+            </div>
+
+            <p class="familiar" *ngIf="userPortfolio?.roles_and_skills?.frameworks.length">
+              Also familiar using
+              <span class="blue"
+                    *ngFor="let framework of userPortfolio?.roles_and_skills?.frameworks; let index = index">
+                {{ framework | stringFormatPipe }}<span
+                *ngIf="index + 1 < userPortfolio?.roles_and_skills?.frameworks.length">,</span>
+              </span>
+
+
+              <div class="portfolio-little-summary text-center">
+            <p><span *ngIf="userPortfolio.work_preference">Interested in the following <span
+              [innerHTML]="userPortfolio.work_preference|workTypeFormat"></span> <span
+              *ngIf="userPortfolio.work_preference && userPortfolio.work_preference.expected_salary"> roles with a base salary of <span
+              class="blue">{{ userPortfolio?.work_preference?.expected_salary }} per month</span></span></span>.</p>
+            <div class="tags">
+              <ul *ngIf="userPortfolio.roles_and_skills">
+                <li *ngFor="let role of userPortfolio.roles_and_skills.roles">{{ role.value|titleCase }}</li>
+              </ul>
+            </div>
+            <p class="recommended" *ngIf="userCompletedRecommendation && userCompletedRecommendation.length">Recommended
+              by colleagues at
+              <span class="blue"
+                    *ngFor="let recommendation of userCompletedRecommendation; let index = index">{{ recommendation.company_name }}
+                  <span *ngIf="index + 1 < userCompletedRecommendation.length">,</span>
+                </span>
+
+            <ul class="social">
+              <li *ngIf="user.tw_username"><a
+                href="http://www.twitter.com/{{ user.tw_username }}" target="_blank"><img class="grey"
+                                                                                          src="../../assets/img/twitter.svg"></a>
+              </li>
+              <li *ngIf="user.fb_username"><a
+                href="http://www.facebook.com/{{ user.fb_username }}" target="_blank"><img class="grey"
+                                                                                           src="../../assets/img/facebook.svg"></a>
+              </li>
+              <li *ngIf="user.git_username"><a
+                href="http://www.github.com/{{ user.git_username }}" target="_blank"><img class="grey"
+                                                                                          src="../../assets/img/github.svg"></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="form-card animated fadeInUp" id="language-skills"
+             *ngIf="userPortfolio?.roles_and_skills?.languages.length || userPortfolio?.roles_and_skills?.frameworks">
+
+          <h3>Languages & Skills</h3>
+          <ng-container *ngIf="userPortfolio?.roles_and_skills?.languages.length">
+            <div class="language-list">
+              <h4>Language Proficiency</h4>
+              <ul>
+                <li class="language-line"
+                    *ngFor="let language of userPortfolio?.roles_and_skills?.languages">
+                  <h4 class="language">{{ language.value | stringFormatPipe }}</h4>
+                  <div class="broken-lines">
+                    <hr/>
+                  </div>
+                  <h4 class="number-of-years blue"><span
+                    *ngIf="language.experience">{{ language.experience }}</span><span *ngIf="!language.experience">0 years</span>
+                  </h4>
+                </li>
+              </ul>
+            </div>
+          </ng-container>
+
+          <div *ngIf="userPortfolio?.roles_and_skills?.frameworks.length">
+            <h4>Familiar frameworks and build tools</h4>
+            <div class="tags">
+              <ul>
+                <li *ngFor="let framework of userPortfolio?.roles_and_skills?.frameworks">{{ framework |
+                  stringFormatPipe }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card animated fadeInUp"
+             *ngIf="userPortfolio && userPortfolio?.projects && userPortfolio?.projects.length">
+          <h3>Things I've built / worked on</h3>
+          <ul class="works">
+            <li *ngFor="let project of userPortfolio?.projects">
+              <a href="{{ project.link }}" target="_blank">{{ project.link }}</a>
+              <p *ngIf="project.description && project.description.trim() != ''">"{{ project.description }}"</p>
+              <div class="tags" *ngIf="project.technology.length">
+                <ul>
+                  <li *ngFor="let tech of project.technology">{{ tech | stringFormatPipe }}</li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="form-card animated fadeInUp"
+             *ngIf="userCompletedRecommendation && userCompletedRecommendation.length">
+          <h3><span>{{ userCompletedRecommendation.length }}</span>
+            <span *ngIf="userCompletedRecommendation.length > 1">Recommendations</span>
+            <span *ngIf="userCompletedRecommendation.length <= 1">Recommendation</span>
+          </h3>
+
+          <div class="private-note">
+            <p>{{ user.first_name|titleCase }} has <span class="blue">{{ userCompletedRecommendation.length }} recommendation<span *ngIf="userCompletedRecommendation.length > 1">s</span></span> from
+              <span *ngIf="userCompletedRecommendation.length == 1">a</span> colleague<span *ngIf="userCompletedRecommendation.length > 1">s</span> at
+              <ng-container *ngFor="let recommendation of userCompletedRecommendation; let index = index"><span
+                *ngIf="(userCompletedRecommendation.length > 1) && ((index+1) == userCompletedRecommendation.length)"> and</span>
+                <span class="blue">{{ recommendation.company_name }}</span></ng-container>. These recommendations are private to encourage an honest review and are only available to companies looking to hire specific skill set.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+</ng-container>
